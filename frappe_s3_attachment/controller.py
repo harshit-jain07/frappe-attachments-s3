@@ -127,7 +127,7 @@ class S3Operations(object):
                     file_path, self.BUCKET, key,
                     ExtraArgs={
                         "ContentType": content_type,
-                        "ACL": 'public-read',
+                        # "ACL": 'public-read',
                         "Metadata": {
                             "ContentType": content_type,
 
@@ -210,11 +210,13 @@ def file_upload_to_s3(doc, method):
             method = "frappe_s3_attachment.controller.generate_file"
             file_url = """/api/method/{0}?key={1}&file_name={2}""".format(method, key, doc.file_name)
         else:
-            file_url = '{}/{}/{}'.format(
-                s3_upload.S3_CLIENT.meta.endpoint_url,
-                s3_upload.BUCKET,
-                key
-            )
+            method = "frappe_s3_attachment.controller.generate_public_file"
+            file_url = """/api/method/{0}?key={1}&file_name={2}""".format(method, key, doc.file_name)
+            # file_url = '{}/{}/{}'.format(
+            #     s3_upload.S3_CLIENT.meta.endpoint_url,
+            #     s3_upload.BUCKET,
+            #     key
+            # )
         os.remove(file_path)
         frappe.db.sql("""UPDATE `tabFile` SET file_url=%s, folder=%s,
             old_parent=%s, content_hash=%s WHERE name=%s""", (
@@ -226,6 +228,21 @@ def file_upload_to_s3(doc, method):
             frappe.db.set_value(parent_doctype, parent_name, frappe.get_meta(parent_doctype).get('image_field'), file_url)
 
         frappe.db.commit()
+
+
+@frappe.whitelist(allow_guest=True)
+def generate_public_file(key=None, file_name=None):
+    """
+    Function to stream file from s3.
+    """
+    if key:
+        s3_upload = S3Operations()
+        signed_url = s3_upload.get_url(key, file_name)
+        frappe.local.response["type"] = "redirect"
+        frappe.local.response["location"] = signed_url
+    else:
+        frappe.local.response['body'] = "Key not found."
+    return
 
 
 @frappe.whitelist()
@@ -274,11 +291,13 @@ def upload_existing_files_s3(name):
             method = "frappe_s3_attachment.controller.generate_file"
             file_url = """/api/method/{0}?key={1}""".format(method, key)
         else:
-            file_url = '{}/{}/{}'.format(
-                s3_upload.S3_CLIENT.meta.endpoint_url,
-                s3_upload.BUCKET,
-                key
-            )
+            method = "frappe_s3_attachment.controller.generate_public_file"
+            file_url = """/api/method/{0}?key={1}&file_name={2}""".format(method, key, doc.file_name)
+            # file_url = '{}/{}/{}'.format(
+            #     s3_upload.S3_CLIENT.meta.endpoint_url,
+            #     s3_upload.BUCKET,
+            #     key
+            # )
 
         # Remove file from local.
         os.remove(file_path)
