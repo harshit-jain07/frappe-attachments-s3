@@ -323,7 +323,7 @@ def s3_file_regex_match(file_url):
 @frappe.whitelist()
 def migrate_existing_files():
     """
-    Function to migrate the existing files to s3.
+    Function to migrate the existing files to aws s3
     """
 
     files_list = frappe.get_all(
