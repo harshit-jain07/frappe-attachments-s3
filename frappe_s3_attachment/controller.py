@@ -90,13 +90,15 @@ class S3Operations(object):
         if not doc_path:
             if self.folder_name:
                 final_key = self.folder_name + "/" + year + "/" + month + \
-                    "/" + day + "/" + parent_doctype + "/" + key + "_" + \
+                    "/" + day + "/" + (parent_doctype or "") + "/" + key + "_" + \
                     file_name
             else:
+                print("********* year", year, month, day)
                 final_key = year + "/" + month + "/" + day + "/" + \
-                    parent_doctype + "/" + key + "_" + file_name
+                    (parent_doctype or "") + "/" + key + "_" + file_name
             return final_key
         else:
+            print("inside here" , doc_path, type(doc_path))
             final_key = doc_path + '/' + key + "_" + file_name
             return final_key
 
