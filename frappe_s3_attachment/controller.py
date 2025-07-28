@@ -95,7 +95,7 @@ class S3Operations(object):
             else:
                 print("********* year", year, month, day)
                 final_key = year + "/" + month + "/" + day + "/" + \
-                    (parent_doctype or "") + "/" + key + "_" + file_name
+                    (parent_doctype if parent_doctype else "") + "/" + key + "_" + file_name
             return final_key
         else:
             print("inside here" , doc_path, type(doc_path))
