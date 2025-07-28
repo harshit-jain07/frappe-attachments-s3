@@ -302,7 +302,10 @@ def upload_existing_files_s3(name):
             # )
 
         # Remove file from local.
-        os.remove(file_path)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        else:
+            frappe.logger().warning(f"File not found while deleting: {file_path}")
 
         frappe.db.sql(
             """UPDATE `tabFile` SET file_url=%s, folder=%s,
