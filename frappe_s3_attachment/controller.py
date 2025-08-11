@@ -6,6 +6,7 @@ import random
 import re
 import string
 
+from a2z_erp_app.a2z_erp_app.custom_scripts.custom_file import URL_PREFIXES
 import boto3
 
 from botocore.client import Config
@@ -223,7 +224,7 @@ def file_upload_to_s3(doc, method):
             #     key
             # )
 
-        file_url = f'{get_url()}{file_url}'
+        # file_url = f'{get_url()}{file_url}'
         
         os.remove(file_path)
         frappe.db.sql("""UPDATE `tabFile` SET file_url=%s, folder=%s,
