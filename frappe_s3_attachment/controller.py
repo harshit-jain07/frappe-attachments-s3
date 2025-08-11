@@ -14,6 +14,7 @@ from botocore.exceptions import ClientError
 import frappe
 
 
+from frappe.utils import get_url
 import magic
 
 
@@ -221,6 +222,9 @@ def file_upload_to_s3(doc, method):
             #     s3_upload.BUCKET,
             #     key
             # )
+
+        file_url = f'{get_url()}{file_url}'
+        
         os.remove(file_path)
         frappe.db.sql("""UPDATE `tabFile` SET file_url=%s, folder=%s,
             old_parent=%s, content_hash=%s WHERE name=%s""", (
