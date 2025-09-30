@@ -195,6 +195,10 @@ def file_upload_to_s3(doc, method):
     """
     s3_upload = S3Operations()
     path = doc.file_url
+    
+    if "frappe_s3_attachment" in path:
+        return
+    
     site_path = frappe.utils.get_site_path()
     parent_doctype = doc.attached_to_doctype or 'File'
     parent_name = doc.attached_to_name
