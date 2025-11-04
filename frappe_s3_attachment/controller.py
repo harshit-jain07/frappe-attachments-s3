@@ -197,6 +197,7 @@ def file_upload_to_s3(doc, method):
     path = doc.file_url
     
     if "frappe_s3_attachment" in path:
+        frappe.log_error(f"File already exists on s3: {path}", doc.as_dict())
         return
     
     site_path = frappe.utils.get_site_path()
@@ -230,7 +231,12 @@ def file_upload_to_s3(doc, method):
 
         # file_url = f'{get_url()}{file_url}'
         
-        os.remove(file_path)
+        # Remove file from local.
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        else:
+            frappe.log_error(f"File not found while deleting: {file_path}", doc.as_dict())
+
         frappe.db.sql("""UPDATE `tabFile` SET file_url=%s, folder=%s,
             old_parent=%s, content_hash=%s WHERE name=%s""", (
             file_url, 'Home/Attachments', 'Home/Attachments', key, doc.name))
