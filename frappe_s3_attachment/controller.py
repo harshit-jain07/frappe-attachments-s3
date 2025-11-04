@@ -223,17 +223,11 @@ def file_upload_to_s3(doc, method):
         else:
             method = "frappe_s3_attachment.controller.generate_public_file"
             file_url = """/api/method/{0}?key={1}&file_name={2}""".format(method, key, doc.file_name)
-            # file_url = '{}/{}/{}'.format(
-            #     s3_upload.S3_CLIENT.meta.endpoint_url,
-            #     s3_upload.BUCKET,
-            #     key
-            # )
-
-        # file_url = f'{get_url()}{file_url}'
         
         # Remove file from local.
         if os.path.exists(file_path):
             os.remove(file_path)
+            frappe.log_error(f"File deleted: {file_path}", doc.as_dict())
         else:
             frappe.log_error(f"File not found while deleting: {file_path}", doc.as_dict())
 
